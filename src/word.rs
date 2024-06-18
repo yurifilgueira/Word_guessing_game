@@ -27,9 +27,9 @@ impl PartialEq for Word {
     }
 }
 
-pub fn build_word(word: String) -> Word {
-    Word {
-        word,
+impl Word {
+    pub fn new(word: String) -> Self {
+        Self {word}
     }
 }
 
