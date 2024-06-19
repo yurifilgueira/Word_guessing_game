@@ -1,15 +1,15 @@
 pub mod word;
 
-use word::build_word;
+use word::Word;
 
 fn main() {
-    let w1 = build_word(String::from("sabia"));
-    let w2 = build_word(String::from("sabiá"));
-    let w3 = build_word(String::from("sábia"));
-    let w4 = build_word(String::from("trem"));
-    let w5 = build_word(String::from("cinco"));
-    let w6 = build_word(String::from("língua"));
-    let w7 = build_word(String::from("TREM"));
+    let w1 = Word::new(String::from("sabia"));
+    let w2 = Word::new(String::from("sabiá"));
+    let w3 = Word::new(String::from("sábia"));
+    let w4 = Word::new(String::from("trem"));
+    let w5 = Word::new(String::from("cinco"));
+    let w6 = Word::new(String::from("língua"));
+    let w7 = Word::new(String::from("TREM"));
     
     println!("{}", w1 == w2);
     println!("{}", w2 == w3);
