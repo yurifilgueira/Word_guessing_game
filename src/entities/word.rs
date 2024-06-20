@@ -1,8 +1,17 @@
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Eq)]
+#[derive(Hash)]
+#[derive(Ord)]
+#[derive(PartialOrd)]
 pub struct Word {
     word: String,
+}
+
+impl Word {
+    pub fn new(word: String) -> Self {
+        Self {word: word.to_uppercase()}
+    }
 }
 
 impl fmt::Display for Word {
@@ -17,19 +26,13 @@ impl PartialEq for Word {
             return false;
         }
         
-        for (l1, l2) in self.word.to_lowercase().chars().zip(other.word.to_lowercase().chars()) {
+        for (l1, l2) in self.word.chars().zip(other.word.chars()) {
             if !letters_are_equal(l1, l2) {
                 return false;
             }
         }
         
         true
-    }
-}
-
-impl Word {
-    pub fn new(word: String) -> Self {
-        Self {word}
     }
 }
 
@@ -40,11 +43,17 @@ fn letters_are_equal(first_letter: char, second_letter: char) -> bool {
 fn normalize_char(c: char) -> char {
     match c {
         'á' | 'à' | 'â' | 'ã' => 'a',
+        'Á' | 'À' | 'Â' | 'Ã' => 'A',
         'é' | 'è' | 'ê' => 'e',
+        'É' | 'È' | 'Ê' => 'E',
         'í' | 'ì' | 'î' => 'i',
+        'Í' | 'Ì' | 'Î' => 'I',
         'ó' | 'ò' | 'ô' | 'õ' => 'o',
+        'Ó' | 'Ò' | 'Ô' | 'Õ' => 'O',
         'ú' | 'ù' | 'û' | 'ü' => 'u',
+        'Ú' | 'Ù' | 'Û' | 'Ü' => 'U',
         'ç' => 'c',
+        'Ç' => 'C',
         _ => c,
     }
 }

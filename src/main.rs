@@ -1,6 +1,10 @@
-pub mod word;
+mod entities;
 
-use word::Word;
+use crate::entities::Difficulty;
+use entities::Game;
+use crate::entities::Language;
+use entities::Player;
+use entities::Word;
 
 fn main() {
     let w1 = Word::new(String::from("sabia"));
@@ -20,4 +24,19 @@ fn main() {
     println!("{}", w3 == w6);
     
     println!("{}", w4 == w7);
+
+    println!("{}", w1);
+
+    let mut p1 = Player::new(String::from("Yato"));
+    let p2 = Player::new(String::from("Mariana"));
+
+    p1.guess_word(w1);
+    p1.guess_word(w5);
+    p1.guess_word(w7);
+
+    p1.show_guessed_words();
+
+    let g1 = Game::new(p1, p2, Difficulty::Easy, Language::Portuguese);
+    println!("{}", g1);
+    g1.show_wordlist();
 }
