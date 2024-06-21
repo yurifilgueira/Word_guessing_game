@@ -18,13 +18,16 @@ pub struct Game {
 
 impl Game {
     pub fn new(first_player: Player, second_player: Player, difficulty: Difficulty, language: Language) -> Self {
+        let difficulty_number = get_difficulty_number(&difficulty);
+        let language_name = get_language_name(&language);
+
         Self {
             first_player,
             second_player,
-            difficulty,
-            language,
+            difficulty: difficulty.clone(),
+            language: language.clone(),
             round: 0,
-            wordlist: read_to_string(format!("resources/wordlist_{}_{}.txt", get_language(), get_difficulty_number()))
+            wordlist: read_to_string(format!("resources/wordlist_{}_{}.txt", language_name, difficulty_number))
                 .expect("Erro ao ler o arquivo")
                 .lines()
                 .map(|line| Word::new(line.trim().to_string()))
@@ -46,10 +49,17 @@ impl fmt::Display for Game {
     }
 }
 
-fn get_difficulty_number() -> String {
-    String::from("6")
+fn get_difficulty_number(difficulty: &Difficulty) -> &str {
+    match difficulty {
+        Difficulty::Easy => "6",
+        Difficulty::Normal => "7",
+        Difficulty::Hard => "8",
+    }
 }
 
-fn get_language() -> String {
-    String::from("english")
+fn get_language_name(language: &Language) -> &str {
+    match language {
+        Language::English => "english",
+        Language::Portuguese => "portuguese",
+    }
 }
