@@ -29,5 +29,8 @@ fn main() {
 
     let g1 = Game::new("Yato", "Aqua", Difficulty::Easy, Language::Portuguese);
     println!("{}", g1);
-    g1.show_wordlist();
+    // g1.show_wordlist();
+
+    println!("Selected word: {}", g1.get_selected_word());
+
 }

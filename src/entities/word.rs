@@ -12,6 +12,11 @@ impl Word {
     pub fn new(word: &str) -> Self {
         Self {word: String::from(word.to_uppercase())}
     }
+
+    pub fn get_word(&self) -> &str{
+        &self.word
+    }
+
 }
 
 impl fmt::Display for Word {
