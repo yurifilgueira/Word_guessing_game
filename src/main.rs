@@ -7,13 +7,13 @@ use entities::Player;
 use entities::Word;
 
 fn main() {
-    let w1 = Word::new(String::from("sabia"));
-    let w2 = Word::new(String::from("sabiá"));
-    let w3 = Word::new(String::from("sábia"));
-    let w4 = Word::new(String::from("trem"));
-    let w5 = Word::new(String::from("cinco"));
-    let w6 = Word::new(String::from("língua"));
-    let w7 = Word::new(String::from("TREM"));
+    let w1 = Word::new("sabia");
+    let w2 = Word::new("sabiá");
+    let w3 = Word::new("sábia");
+    let w4 = Word::new("trem");
+    let w5 = Word::new("cinco");
+    let w6 = Word::new("língua");
+    let w7 = Word::new("TREM");
     
     println!("{}", w1 == w2);
     println!("{}", w2 == w3);
@@ -27,16 +27,7 @@ fn main() {
 
     println!("{}", w1);
 
-    let mut p1 = Player::new(String::from("Yato"));
-    let p2 = Player::new(String::from("Mariana"));
-
-    p1.guess_word(w1);
-    p1.guess_word(w5);
-    p1.guess_word(w7);
-
-    p1.show_guessed_words();
-
-    let g1 = Game::new(p1, p2, Difficulty::Easy, Language::Portuguese);
+    let g1 = Game::new("Yato", "Aqua", Difficulty::Easy, Language::Portuguese);
     println!("{}", g1);
     g1.show_wordlist();
 }

@@ -9,9 +9,9 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(name: String) -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
-            name,
+            name: String::from(name),
             guesses: BinaryHeap::new(),
         }
     }

@@ -9,8 +9,8 @@ pub struct Word {
 }
 
 impl Word {
-    pub fn new(word: String) -> Self {
-        Self {word: word.to_uppercase()}
+    pub fn new(word: &str) -> Self {
+        Self {word: String::from(word.to_uppercase())}
     }
 }
 

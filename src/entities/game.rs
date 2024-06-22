@@ -14,10 +14,14 @@ pub struct Game {
     language: Language,
     round: usize,
     wordlist: HashSet<Word>,
+    selected_word: Word,
 }
 
 impl Game {
-    pub fn new(first_player: Player, second_player: Player, difficulty: Difficulty, language: Language) -> Self {
+    pub fn new(first_player_name: &str, second_player_name: &str, difficulty: Difficulty, language: Language) -> Self {
+        let first_player = Player::new(first_player_name);
+        let second_player = Player::new(second_player_name);
+
         let difficulty_number = get_difficulty_number(&difficulty);
         let language_name = get_language_name(&language);
 
@@ -30,8 +34,9 @@ impl Game {
             wordlist: read_to_string(format!("resources/wordlist_{}_{}.txt", language_name, difficulty_number))
                 .expect("Erro ao ler o arquivo")
                 .lines()
-                .map(|line| Word::new(line.trim().to_string()))
+                .map(|line| Word::new(line.trim()))
                 .collect(),
+            selected_word: Word::new("")
         }
     }
 
@@ -41,6 +46,8 @@ impl Game {
             println!("{}", w);
         }
     }
+
+
 }
 
 impl fmt::Display for Game {
