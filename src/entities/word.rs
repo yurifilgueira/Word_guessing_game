@@ -1,7 +1,6 @@
-use std::fmt;
+use std::{fmt, hash::Hash};
 
 #[derive(Eq)]
-#[derive(Hash)]
 #[derive(Ord)]
 #[derive(PartialOrd)]
 pub struct Word {
@@ -29,24 +28,33 @@ impl fmt::Display for Word {
     }
 }
 
+impl Hash for Word {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        for c in self.word.chars() {
+            normalize_char(c).hash(state); // Hash normalized characters
+        }
+    }
+}
+
 impl PartialEq for Word {
     fn eq(&self, other: &Word) -> bool {
         if self.word.chars().count() != other.word.chars().count() {
             return false;
         }
-        
+
         for (l1, l2) in self.word.chars().zip(other.word.chars()) {
+
             if !letters_are_equal(l1, l2) {
                 return false;
             }
         }
-        
+
         true
     }
 }
 
 fn letters_are_equal(first_letter: char, second_letter: char) -> bool {
-   normalize_char(first_letter) == normalize_char(second_letter)
+    normalize_char(first_letter) == normalize_char(second_letter)
 }
 
 fn normalize_char(c: char) -> char {
