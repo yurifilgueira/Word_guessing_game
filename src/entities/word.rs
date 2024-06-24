@@ -31,7 +31,9 @@ impl fmt::Display for Word {
 impl Hash for Word {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         for c in self.word.chars() {
-            normalize_char(c).hash(state); // Hash normalized characters
+            // Calcula o hash de cada caractere normalizado. Depois o Hasher soma tudo para formar
+            // um único código.
+            normalize_char(c).hash(state);
         }
     }
 }
