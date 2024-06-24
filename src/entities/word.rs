@@ -13,8 +13,12 @@ impl Word {
         Self {word: String::from(word.to_uppercase())}
     }
 
-    pub fn get_word(&self) -> &str{
+    pub fn get_word(&self) -> &str {
         &self.word
+    }
+
+    pub fn length(&self) -> usize {
+        self.word.chars().count()
     }
 
 }

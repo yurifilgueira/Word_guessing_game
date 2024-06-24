@@ -927,7 +927,6 @@ dotação
 dourado
 doutora
 driblar
-drinque
 drogado
 dumping
 duodeno
@@ -946,7 +945,6 @@ educado
 efusivo
 efêmero
 egoísmo
-egípcio
 eleitor
 eleição
 elevado
@@ -1545,6 +1543,7 @@ javanês
 javardo
 jeitoso
 jesuíta
+jogadas
 jogador
 jornada
 judaico
@@ -1737,7 +1736,10 @@ medição
 medonho
 medroso
 melodia
+membros
 mendigo
+meninas
+meninos
 mentira
 mercado
 merecer
@@ -1832,7 +1834,6 @@ nascido
 natação
 natural
 navalha
-navarro
 navegar
 neblina
 nefando
@@ -1994,7 +1995,7 @@ pelagem
 pelotão
 pelouro
 penacho
-penalti
+pênalti
 penetra
 penhora
 pensado
