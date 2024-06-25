@@ -43,7 +43,6 @@ acorrer
 acusado
 acólito
 adaptar
-ademais
 adensar
 adentro
 adequar
@@ -385,7 +384,6 @@ batedor
 batente
 bateria
 batuque
-bauxite
 beijado
 beirada
 bendito
@@ -2053,7 +2051,6 @@ poderio
 poetisa
 polegar
 poleiro
-polonês
 polpudo
 poluído
 pomposo
@@ -2091,11 +2088,9 @@ prendar
 prender
 preparo
 prestar
-prestes
 prezado
 primata
 privado
-probler
 procura
 produto
 profano
@@ -2132,7 +2127,6 @@ púrpura
 quadrar
 quadril
 quantia
-quantum
 quartel
 quartzo
 quebrar
@@ -2157,7 +2151,6 @@ rafeiro
 raivoso
 ramaria
 ranhura
-ranking
 rapidez
 rasgado
 raspado
@@ -2316,7 +2309,6 @@ risinho
 risonho
 risível
 ritmado
-roberto
 robusto
 roceiro
 rochedo
@@ -2366,6 +2358,7 @@ sangrar
 sangria
 sanzala
 sapador
+sapatos
 sapiens
 saquear
 sarampo
@@ -2378,8 +2371,8 @@ saudita
 saudoso
 saveiro
 sazonal
-scanner
 sebenta
+sebento
 secagem
 secreta
 secreto

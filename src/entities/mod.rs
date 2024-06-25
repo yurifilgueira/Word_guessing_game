@@ -6,7 +6,7 @@ pub use game::Game;
 pub use player::Player;
 pub use word::Word;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum Difficulty {
     Easy,
     Normal,

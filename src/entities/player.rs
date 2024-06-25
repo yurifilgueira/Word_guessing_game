@@ -20,14 +20,14 @@ impl Player {
         self.guesses.push(word);
     }
 
-    pub fn show_guessed_words(&self) {
-        print!("Guessed words of {}: ", self.name);
-
+    pub fn has_guessed_word(&self, word: &Word) -> bool {
         for w in &self.guesses {
-            print!("{}, ", w);
+            if w == word {
+                return true;
+            }
         }
 
-        println!("");
+        false
     }
 }
 
