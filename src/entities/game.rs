@@ -1,9 +1,9 @@
+use clearscreen::clear;
 use core::panic;
 use std::collections::HashSet;
 use std::fmt;
 use std::fs::read_to_string;
 use std::io::stdin;
-/* use std::process::Command; */
 
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
@@ -59,9 +59,6 @@ impl Game {
 
             stdin().read_line(&mut user_input).expect("Failed to read the word.");
 
-            /* let mut clear_command = Command::new("clear");
-            clear_command.output().expect("Failed to execute process."); */
-
             guess = Word::new(&user_input.trim_end());
 
             if guess.length() != self.selected_word.length() {
@@ -75,8 +72,8 @@ impl Game {
                 }
             } else if self.difficulty != Difficulty::Hard && (self.first_player.has_guessed_word(&guess) || self.second_player.has_guessed_word(&guess)) {
                 match self.language {
-                    Language::English => println!("Repeat words in not allowed."),
-                    Language::Portuguese => println!("Repetir palavra não é permitido."),
+                    Language::English => println!("Repeat played words in not allowed."),
+                    Language::Portuguese => println!("Repetir palavras já jogadas não é permitido."),
                 }
                 
             } else {
@@ -88,6 +85,7 @@ impl Game {
     }
 
     fn show_welcome_message(&self) {
+        clear().unwrap();
         match self.language {
             Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mEasy\x1b[0m",
@@ -185,10 +183,6 @@ impl Game {
                 Language::Portuguese => "venceu o jogo",
             });
         }
-    }
-    
-    pub fn get_selected_word(&self) -> &str {
-        &self.selected_word.get_word()
     }
 }
 

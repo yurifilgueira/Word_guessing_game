@@ -645,6 +645,7 @@ colagem
 colapso
 colação
 colchão
+coleção
 coleira
 coletar
 colidir
@@ -926,7 +927,6 @@ dourado
 doutora
 driblar
 drogado
-dumping
 duodeno
 duquesa
 durante
@@ -1415,10 +1415,7 @@ hilário
 hipnose
 hirsuto
 hissope
-holanda
-holding
 honesto
-honoris
 honrado
 honroso
 hormona
@@ -1488,7 +1485,7 @@ infusão
 infâmia
 ingerir
 ingrato
-ingénuo
+ingênuo
 inibido
 inicial
 iniciar
@@ -1586,7 +1583,6 @@ latrina
 lavagem
 lavoura
 lavrado
-leasing
 legação
 legenda
 legista
@@ -2102,6 +2098,7 @@ propina
 provado
 provido
 prática
+prático
 prédica
 prólogo
 prótese
@@ -2643,8 +2640,6 @@ vendido
 venerar
 ventoso
 ventral
-ventura
-venture
 verbete
 verdade
 verdura
