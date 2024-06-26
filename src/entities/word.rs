@@ -22,11 +22,22 @@ impl Word {
     }
 
     pub fn show_status(&self, selected_word: &Word) {
+        let mut letter_counts: HashMap<char, usize> = HashMap::new();
+
+        for i in 0..selected_word.word.chars().count() {
+            if self.word.contains(normalize_char(self.word.chars().nth(i).unwrap())) && normalize_char(self.word.chars().nth(i).unwrap()) != normalize_char(selected_word.word.chars().nth(i).unwrap()) {
+                *letter_counts.entry(normalize_char(selected_word.word.chars().nth(i).unwrap())).or_insert(0) += 1;
+            }
+        }
+
+        let mut counted_letters: HashMap<char, usize> = HashMap::new();
+
         for i in 0..self.word.chars().count() {
             if normalize_char(self.word.chars().nth(i).unwrap()) == normalize_char(selected_word.word.chars().nth(i).unwrap()) {
                 print!("\x1b[32m{}\x1b[0m", self.word.chars().nth(i).unwrap());
-            } else if selected_word.word.nfc().collect::<String>().contains(normalize_char(self.word.chars().nth(i).unwrap())) {
+            } else if selected_word.word.nfc().collect::<String>().contains(normalize_char(self.word.chars().nth(i).unwrap())) && *counted_letters.entry(normalize_char(self.word.chars().nth(i).unwrap())).or_insert(0) < *letter_counts.entry(normalize_char(self.word.chars().nth(i).unwrap())).or_insert(0) {
                 print!("\x1b[33m{}\x1b[0m", self.word.chars().nth(i).unwrap());
+                *counted_letters.entry(normalize_char(self.word.chars().nth(i).unwrap())).or_insert(0) += 1;
             } else {
                 print!("{}", self.word.chars().nth(i).unwrap());
             }
