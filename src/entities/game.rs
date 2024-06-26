@@ -61,9 +61,7 @@ impl Game {
 
             guess = Word::new(&user_input.trim_end());
 
-            if self.difficulty == Difficulty::Hard {
-                clear().unwrap();
-            }
+            clear().unwrap();
 
             if guess.length() != self.selected_word.length() {
                 match self.language {
@@ -90,9 +88,8 @@ impl Game {
 
     fn show_welcome_message(&self) {
         clear().unwrap();
-        println!("{}", self.selected_word);
         match self.language {
-            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.difficulty {
+            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nIn each player's turn, the player will make a guess until a valid play.\nRepeat words is {}allowed.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mEasy\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mHard\x1b[0m",
@@ -100,7 +97,7 @@ impl Game {
                 Difficulty::Hard => "",
                 _ => "not ",
             }),
-            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nRepetir palavras {}é permitido.", match self.difficulty {
+            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nEm cada turno, o jogador fará um guess até uma jogada válida.\nRepetir palavras {}é permitido.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mFácil\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mDifícil\x1b[0m",
@@ -143,12 +140,10 @@ impl Game {
             if *guess == self.selected_word {
                 self.end_game();
             } else {
-                if self.difficulty == Difficulty::Hard {
-                    print!("{}", match self.language {
-                        Language::English => "Last guess: ",
-                        Language::Portuguese => "Última jogada: ",
-                    });
-                }
+                print!("{}", match self.language {
+                    Language::English => "Last guess: ",
+                    Language::Portuguese => "Última jogada: ",
+                });
 
                 for word in &self.wordlist {
                     if word == guess {
