@@ -61,6 +61,10 @@ impl Game {
 
             guess = Word::new(&user_input.trim_end());
 
+            if self.difficulty == Difficulty::Hard {
+                clear().unwrap();
+            }
+
             if guess.length() != self.selected_word.length() {
                 match self.language {
                     Language::English => {
@@ -86,17 +90,24 @@ impl Game {
 
     fn show_welcome_message(&self) {
         clear().unwrap();
+        println!("{}", self.selected_word);
         match self.language {
-            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.", match self.difficulty {
+            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mEasy\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mHard\x1b[0m",
-            }, get_difficulty_number(&self.difficulty)),
-            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.", match self.difficulty {
+            }, self, get_difficulty_number(&self.difficulty), match self.difficulty {
+                Difficulty::Hard => "",
+                _ => "not ",
+            }),
+            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nRepetir palavras {}é permitido.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mFácil\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mDifícil\x1b[0m",
-            }, get_difficulty_number(&self.difficulty)),
+            }, self, get_difficulty_number(&self.difficulty), match self.difficulty {
+                Difficulty::Hard => "",
+                _ => "não ",
+            }),
         }
     }
 
@@ -132,10 +143,12 @@ impl Game {
             if *guess == self.selected_word {
                 self.end_game();
             } else {
-                print!("{} guess: ", match self.language {
-                    Language::English => "Your",
-                    Language::Portuguese => "Seu",
-                });
+                if self.difficulty == Difficulty::Hard {
+                    print!("{}", match self.language {
+                        Language::English => "Last guess: ",
+                        Language::Portuguese => "Última jogada: ",
+                    });
+                }
 
                 for word in &self.wordlist {
                     if word == guess {
@@ -147,14 +160,10 @@ impl Game {
             }
             
         } else {
-            match self.language {
-                Language::English => {
-                    println!("{} is an invalid word.", guess);
-                },
-                Language::Portuguese => {
-                    println!("{} é uma palavra inválida.", guess);
-                },
-            }
+            println!("{} {}", guess, match self.language {
+                Language::English => "is an invalid word or is not present in wordlist.",
+                Language::Portuguese => "é uma palavra inválida ou não está presente na lista de palavras.",
+            });
         }
     }
 
@@ -167,28 +176,40 @@ impl Game {
     }
 
     fn end_game(&self) {
-        println!("{} guess: \x1b[32m{}\x1b[0m", match self.language {
-            Language::English => "Your",
-            Language::Portuguese => "Seu",
-        }, self.selected_word);
+        println!("\x1b[32m{}\x1b[0m", self.selected_word);
         
         if self.turn {
-            println!("\n{} {}!", self.first_player, match self.language {
-                Language::English => "won the game",
-                Language::Portuguese => "venceu o jogo",
+            print!("\n{} {} ", self.first_player, match self.language {
+                Language::English => "won the game after",
+                Language::Portuguese => "venceu o jogo após",
             });
         } else {
-            println!("\n{} {}!", self.second_player, match self.language {
-                Language::English => "won the game",
-                Language::Portuguese => "venceu o jogo",
+            print!("\n{} {} ", self.second_player, match self.language {
+                Language::English => "won the game after",
+                Language::Portuguese => "venceu o jogo após",
             });
+        }
+
+        if self.round == 1 {
+            println!("{}!", match self.language {
+                Language::English => "only one try",
+                Language::Portuguese => "uma única tentativa",
+            })
+        } else {
+            println!("{} {}!", self.round, match self.language {
+                Language::English => "tries",
+                Language::Portuguese => "tentativas",
+            })
         }
     }
 }
 
 impl fmt::Display for Game {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[First player: {}] [Second player: {}] [Current round: {}]", self.first_player, self.second_player, self.round)
+        match self.language {
+            Language::English => write!(f, "[First player: {}] [Second player: {}]", self.first_player, self.second_player),
+            Language::Portuguese => write!(f, "[Primeiro jogador: {}] [Segundo jogador: {}]", self.first_player, self.second_player),
+        }
     }
 }
 

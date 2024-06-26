@@ -1,5 +1,5 @@
 use std::{fmt, hash::Hash};
-/* use std::collections::HashMap; */
+use std::collections::HashMap;
 extern crate unicode_normalization;
 use unicode_normalization::UnicodeNormalization;
 

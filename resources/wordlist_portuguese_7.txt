@@ -531,9 +531,7 @@ carreto
 carroça
 cartada
 cartola
-cartoon
 carícia
-casaria
 casario
 casarão
 cascata
@@ -1198,7 +1196,6 @@ fabrico
 fachada
 factual
 fadista
-faiança
 faiscar
 falange
 falante
@@ -1857,7 +1854,6 @@ notário
 notável
 notícia
 notório
-nouveau
 noventa
 novilho
 nubente
@@ -1909,7 +1905,6 @@ oriundo
 orvalho
 oráculo
 oscilar
-otomano
 ourives
 ousadia
 outdoor

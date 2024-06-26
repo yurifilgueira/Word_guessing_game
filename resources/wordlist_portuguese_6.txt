@@ -2057,8 +2057,6 @@ nossas
 nossos
 notada
 notado
-noutra
-noutro
 novata
 novato
 novela
