@@ -1,10 +1,13 @@
 use std::collections::BinaryHeap;
 use std::fmt;
 
+use serde_derive::{Deserialize, Serialize};
+
 use crate::Word;
 
+#[derive(Serialize, Deserialize)]
 pub struct Player {
-    name: String,
+    pub name: String,
     guesses: BinaryHeap<Word>,
 }
 

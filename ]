@@ -5,6 +5,8 @@ use std::time::Duration;
 
 use bincode::{deserialize, serialize};
 
+// Certifique-se de que o módulo 'entities' esteja definido em outro arquivo
+// e que as structs Player, Game, etc., estejam implementadas nele.
 mod entities; 
 use crate::entities::{Difficulty, Game, Language, Player, Word};
 
@@ -21,8 +23,13 @@ fn main() {
 
         let listener = TcpListener::bind("127.0.0.1:6000").expect("Listener failed");
 
-        if let Ok((mut stream, _addr)) = listener.accept() {
-            thread::spawn(move || handle_client(&mut stream, &username));
+        // Aceitar apenas a primeira conexão
+        if let Ok((mut stream, _)) = listener.accept() {
+            thread::spawn(move || handle_client(&mut stream));
+
+            loop {
+
+            }
         } else {
             eprintln!("Erro ao aceitar a conexão.");
         }
@@ -31,7 +38,7 @@ fn main() {
         let mut client = TcpStream::connect("127.0.0.1:6000").expect("Falha ao conectar ao servidor");
         client.set_nonblocking(true).expect("Falha ao definir modo não bloqueante");
 
-        let player = Player::new(username.trim());
+        let player = Player::new(username.trim()); // Correção aqui
         let player_bytes = serialize(&player).expect("Falha ao serializar jogador");
         client.write_all(&player_bytes).expect("Falha ao enviar dados do jogador");
 
