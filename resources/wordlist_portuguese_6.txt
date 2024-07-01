@@ -364,7 +364,6 @@ beleza
 belgas
 benzer
 benção
-beques
 bereba
 berrar
 berços
@@ -407,8 +406,6 @@ bodega
 boiada
 boiado
 boinas
-bojuda
-bojudo
 bolada
 bolado
 bolero
