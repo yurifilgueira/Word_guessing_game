@@ -1,16 +1,18 @@
+use bincode::serialize;
 use clearscreen::clear;
 use core::panic;
 use std::collections::HashSet;
 use std::fmt;
-use std::fmt::format;
 use std::fs::read_to_string;
 use std::io::stdin;
+use std::io::Read;
 use std::io::Write;
 use std::net::TcpStream;
 
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
 
+use crate::entities::GameConfig;
 use crate::Difficulty;
 use crate::Language;
 use crate::Player;
@@ -55,14 +57,21 @@ impl Game {
 
         let welcome_message = self.show_welcome_message();
         println!("{}", welcome_message);
-        let _ = stream.write_all(welcome_message.as_str().as_bytes());
+        let game_info_bytes = serialize(&GameConfig::new(&self.first_player.name, &self.second_player.name, self.language.clone(), self.difficulty.clone())).expect("Errot to serialize");
+        let _ = stream.write_all(&game_info_bytes);
 
         while guess != self.selected_word {
+
             let mut user_input: String = Default::default();
-            
+
             self.announce_player_turn();
 
-            stdin().read_line(&mut user_input).expect("Failed to read the word.");
+            if self.turn {
+                stdin().read_line(&mut user_input).expect("Failed to read the word.");
+            }
+            else {
+                user_input = read_client_guess(stream);
+            }
 
             guess = Word::new(&user_input.trim_end());
 
@@ -84,7 +93,7 @@ impl Game {
                     Language::English => println!("Repeat played words in not allowed."),
                     Language::Portuguese => println!("Repetir palavras já jogadas não é permitido."),
                 }
-                
+
             } else {
                 self.check_word_in_wordlist(&guess);
             }
@@ -93,7 +102,7 @@ impl Game {
         }
     }
 
-        fn show_welcome_message(&self) -> String{
+    fn show_welcome_message(&self) -> String{
         clear().unwrap();
         println!("{}", self.selected_word);
         match self.language {
@@ -163,7 +172,7 @@ impl Game {
 
                 self.next_play();
             }
-            
+
         } else {
             println!("{} {}", guess, match self.language {
                 Language::English => "is an invalid word or is not present in wordlist.",
@@ -182,7 +191,7 @@ impl Game {
 
     fn end_game(&self) {
         println!("\x1b[32m{}\x1b[0m", self.selected_word);
-        
+
         if self.turn {
             print!("\n{} {} ", self.first_player, match self.language {
                 Language::English => "won the game after",
@@ -244,9 +253,33 @@ fn get_random_word(wordlist: &HashSet<Word>) -> Word {
 
 fn get_wordlist(language_name: &str, difficulty_number: &str) -> HashSet<Word>{
     read_to_string(format!("resources/wordlist_{}_{}.txt", language_name, difficulty_number))
-                .expect("Failed to read the file.")
-                .lines()
-                .map(|line| Word::new(line.trim()))
-                .collect()
+        .expect("Failed to read the file.")
+        .lines()
+        .map(|line| Word::new(line.trim()))
+        .collect()
 }
 
+fn read_client_guess(stream: &mut TcpStream) -> String {
+    let mut buffer = Vec::new();
+
+    let mut temp_buffer = [0; 1024];
+    match stream.read(&mut temp_buffer) {
+
+        Ok(n) => {
+            buffer.extend_from_slice(&temp_buffer[..n]);
+
+            if let Ok(guess) = String::from_utf8(buffer.clone()) { 
+
+                buffer.clear();
+                
+                return guess; 
+            }
+            else {
+                panic!("Error reading from client");
+            }
+        }, 
+        Err(e) => {
+            panic!("Error reading from client: {}", e);
+        }
+    }
+}
