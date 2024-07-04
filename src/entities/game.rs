@@ -75,9 +75,7 @@ impl Game {
 
             guess = Word::new(&user_input.trim_end());
 
-            if self.difficulty == Difficulty::Hard {
-                clear().unwrap();
-            }
+            clear().unwrap();
 
             if guess.length() != self.selected_word.length() {
                 match self.language {
@@ -104,7 +102,6 @@ impl Game {
 
     fn show_welcome_message(&self) -> String{
         clear().unwrap();
-        println!("{}", self.selected_word);
         match self.language {
             Language::English => format!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mEasy\x1b[0m",
@@ -157,12 +154,10 @@ impl Game {
             if *guess == self.selected_word {
                 self.end_game();
             } else {
-                if self.difficulty == Difficulty::Hard {
-                    print!("{}", match self.language {
-                        Language::English => "Last guess: ",
-                        Language::Portuguese => "Última jogada: ",
-                    });
-                }
+                print!("{}", match self.language {
+                    Language::English => "Last guess: ",
+                    Language::Portuguese => "Última jogada: ",
+                });
 
                 for word in &self.wordlist {
                     if word == guess {
