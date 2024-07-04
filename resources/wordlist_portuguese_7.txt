@@ -96,7 +96,6 @@ alameda
 alargar
 alarido
 alarmar
-albanês
 albarda
 alcaide
 alcance
@@ -112,7 +111,6 @@ alertar
 alferes
 alforge
 algures
-alheado
 aliança
 aliciar
 alienar
@@ -159,7 +157,6 @@ amparar
 ampliar
 amuleto
 amurada
-américa
 amêndoa
 ancinho
 ancorar
@@ -173,7 +170,6 @@ anexado
 anfíbio
 angolar
 angular
-anhembi
 animado
 aninhar
 anistia
@@ -2314,8 +2310,6 @@ rolagem
 rolante
 roliçar
 romance
-romaria
-romeiro
 roquete
 roseira
 rosário
@@ -2323,7 +2317,6 @@ rotação
 roteiro
 rotular
 rotunda
-ruandês
 ruidoso
 ruminar
 ruptura
@@ -2449,8 +2442,6 @@ sotaque
 soturno
 soviete
 sozinho
-special
-sputnik
 sublime
 suborno
 subsolo
