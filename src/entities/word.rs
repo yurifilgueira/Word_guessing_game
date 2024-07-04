@@ -1,9 +1,10 @@
 use std::{fmt, hash::Hash};
 use std::collections::HashMap;
 extern crate unicode_normalization;
+use serde_derive::{Deserialize, Serialize};
 use unicode_normalization::UnicodeNormalization;
 
-#[derive(Eq, Ord, PartialOrd)]
+#[derive(Eq, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct Word {
     word: String,
 }
