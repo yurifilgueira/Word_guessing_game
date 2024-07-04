@@ -2,8 +2,11 @@ use clearscreen::clear;
 use core::panic;
 use std::collections::HashSet;
 use std::fmt;
+use std::fmt::format;
 use std::fs::read_to_string;
 use std::io::stdin;
+use std::io::Write;
+use std::net::TcpStream;
 
 use rand::seq::IteratorRandom;
 use rand::thread_rng;
@@ -47,10 +50,12 @@ impl Game {
         }
     }
 
-    pub fn start(&mut self) {
+    pub fn start(&mut self, stream: &mut TcpStream) {
         let mut guess = Word::new("");
 
-        self.show_welcome_message();
+        let welcome_message = self.show_welcome_message();
+        println!("{}", welcome_message);
+        let _ = stream.write_all(welcome_message.as_str().as_bytes());
 
         while guess != self.selected_word {
             let mut user_input: String = Default::default();
@@ -88,11 +93,11 @@ impl Game {
         }
     }
 
-    fn show_welcome_message(&self) {
+        fn show_welcome_message(&self) -> String{
         clear().unwrap();
         println!("{}", self.selected_word);
         match self.language {
-            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.difficulty {
+            Language::English => format!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mEasy\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mHard\x1b[0m",
@@ -100,7 +105,7 @@ impl Game {
                 Difficulty::Hard => "",
                 _ => "not ",
             }),
-            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nRepetir palavras {}é permitido.", match self.difficulty {
+            Language::Portuguese => format!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nRepetir palavras {}é permitido.", match self.difficulty {
                 Difficulty::Easy => "\x1b[32mFácil\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mDifícil\x1b[0m",
