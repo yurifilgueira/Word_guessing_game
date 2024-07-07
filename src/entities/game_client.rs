@@ -1,8 +1,5 @@
-use bincode::serialize;
 use clearscreen::clear;
-use core::panic;
 use std::collections::HashSet;
-use std::fmt;
 use std::fs::read_to_string;
 use std::io::stdin;
 use std::io::ErrorKind;
@@ -11,91 +8,71 @@ use std::io::Write;
 use std::net::TcpStream;
 use std::time::Duration;
 
-use rand::seq::IteratorRandom;
-use rand::thread_rng;
-
 use crate::entities::GameConfig;
 use crate::Difficulty;
 use crate::Language;
-use crate::Player;
 use crate::Word;
 
-pub struct Game {
-    first_player: Player,
-    second_player: Player,
-    difficulty: Difficulty,
-    language: Language,
+pub struct GameClient<'a> {
+    client_stream: &'a mut TcpStream,
+    game_config: GameConfig,
     round: usize,
     turn: bool,
     wordlist: HashSet<Word>,
-    selected_word: Word,
 }
 
-impl Game {
-    pub fn new(first_player_name: &str, second_player_name: &str, difficulty: Difficulty, language: Language) -> Self {
-        let first_player = Player::new(first_player_name);
-        let second_player = Player::new(second_player_name);
+impl<'a> GameClient<'a> {
+    pub fn new(client_stream: &'a mut TcpStream, game_config: GameConfig) -> Self {
+
+        let difficulty = game_config.difficulty.clone();
+        let language = game_config.language.clone();
 
         let difficulty_number = get_difficulty_number(&difficulty);
         let language_name = get_language_name(&language);
 
-        let words = get_wordlist(&language_name, &difficulty_number);
-        let random_word = get_random_word(&words);
-
         Self {
-            first_player,
-            second_player,
-            difficulty: difficulty.clone(),
-            language: language.clone(),
+            client_stream,
+            game_config,
             round: 1,
             turn: true,
-            wordlist: words,
-            selected_word: random_word
+            wordlist: get_wordlist(language_name, difficulty_number)
         }
     }
 
-    pub fn start(&mut self, stream: &mut TcpStream) {
+    pub fn start(&mut self) {
+
         let mut guess = Word::new("");
 
-        let game_info_bytes = serialize(&GameConfig::new(&self.first_player.name,
-                                                         &self.second_player.name,
-                                                         self.language.clone(),
-                                                         self.difficulty.clone(),
-                                                         self.selected_word.get_word())).expect("Errot to serialize");
- 
-
         self.show_welcome_message();
-        let _ = stream.write_all(&game_info_bytes);
 
-        while guess != self.selected_word {
+        while guess != self.game_config.selected_word {
 
             let mut user_input: String = Default::default();
 
             self.announce_player_turn();
 
             if self.turn {
-                stdin().read_line(&mut user_input).expect("Failed to read the word.");
-                
-                let _ = stream.write_all(user_input.as_bytes());
+                user_input = read_player_one_guess(self.client_stream).unwrap();
             }
             else {
-                user_input = read_player_two_guess(stream).unwrap();
+                stdin().read_line(&mut user_input).expect("Failed to read the word.");
+                let _ = self.client_stream.write_all(user_input.as_bytes());
             }
 
-            guess = Word::new(&user_input.trim_end());
+            guess = Word::new(&user_input.trim());
 
+            if guess.length() != self.game_config.selected_word.length() {
+                match self.game_config.language {
+                    Language::English => {
 
-            if guess.length() != self.selected_word.length() {
-                match self.language {
-                    Language::English => { 
-                        println!("{} is an invalid word. Only {} letters long words are valid guesses.", guess, get_difficulty_number(&self.difficulty));
+                        println!("{} is an invalid word. Only {} letters long words are valid guesses.", guess.to_string(), get_difficulty_number(&self.game_config.difficulty));
                     },
                     Language::Portuguese => {
-                        println!("{} é uma palavra inválida. O seu guess deve ter {} caracteres.", guess, get_difficulty_number(&self.difficulty)); 
+                        println!("{} é uma palavra inválida. O seu guess deve ter {} caracteres.", guess.to_string(), get_difficulty_number(&self.game_config.difficulty)); 
                     },
                 }
-            } else if self.difficulty != Difficulty::Hard && (self.first_player.has_guessed_word(&guess) || self.second_player.has_guessed_word(&guess)) {
-                match self.language {
+            } else if self.game_config.difficulty != Difficulty::Hard && (self.game_config.first_player.has_guessed_word(&guess) || self.game_config.second_player.has_guessed_word(&guess)) {
+                match self.game_config.language {
                     Language::English => println!("Repeat played words in not allowed."),
                     Language::Portuguese => println!("Repetir palavras já jogadas não é permitido."),
                 }
@@ -106,44 +83,45 @@ impl Game {
 
             self.add_guessed_word(Word::new(&user_input.trim_end()));
         }
+
     }
 
     fn show_welcome_message(&self) {
         clear().unwrap();
-        match self.language {
-            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.difficulty {
+        match self.game_config.language {
+            Language::English => println!("Welcome to word guessing game!\nLanguage: English\nDifficulty: {}\n\n{}\n\nRules:\nA {} letters long word was drawn.\nThe first player to guess correctly win the game.\nRepeat words is {}allowed.", match self.game_config.difficulty {
                 Difficulty::Easy => "\x1b[32mEasy\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mHard\x1b[0m",
-            }, self, get_difficulty_number(&self.difficulty), match self.difficulty {
+            }, self.game_config, get_difficulty_number(&self.game_config.difficulty), match self.game_config.difficulty {
                 Difficulty::Hard => "",
                 _ => "not ",
             }),
-            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nRepetir palavras {}é permitido.", match self.difficulty {
+            Language::Portuguese => println!("Bem-vindo ao word guessing game!\nIdioma: Português\nDificuldade: {}\n\n{}\n\nRegras:\nUma palavra de {} caracteres foi sorteada.\nO primeiro jogador a adivinhar corretamente vence o jogo.\nRepetir palavras {}é permitido.", match self.game_config.difficulty {
                 Difficulty::Easy => "\x1b[32mFácil\x1b[0m",
                 Difficulty::Normal => "\x1b[33mNormal\x1b[0m",
                 Difficulty::Hard => "\x1b[31mDifícil\x1b[0m",
-            }, self, get_difficulty_number(&self.difficulty), match self.difficulty {
+            }, self.game_config, get_difficulty_number(&self.game_config.difficulty), match self.game_config.difficulty {
                 Difficulty::Hard => "",
                 _ => "não ",
-            }),
+            })
         }
     }
 
     fn announce_player_turn(&self) {
-        match self.language {
+        match self.game_config.language {
             Language::English => {
                 if self.turn {
-                    println!("\n{}º round.\nIt's {}'s turn!", self.round, self.first_player);
+                    println!("\n{}º round.\nIt's {}'s turn!", self.round, self.game_config.first_player);
                 } else {
-                    println!("\n{}º round.\nIt's {}'s turn!", self.round, self.second_player);
+                    println!("\n{}º round.\nIt's {}'s turn!", self.round, self.game_config.second_player);
                 }
             },
             Language::Portuguese => {
                 if self.turn {
-                    println!("\n{}ª rodada.\nÉ a vez de {}!", self.round, self.first_player);
+                    println!("\n{}ª rodada.\nÉ a vez de {}!", self.round, self.game_config.first_player);
                 } else {
-                    println!("\n{}ª rodada.\nÉ a vez de {}!", self.round, self.second_player);
+                    println!("\n{}ª rodada.\nÉ a vez de {}!", self.round, self.game_config.second_player);
                 }
             },
         }
@@ -151,25 +129,25 @@ impl Game {
 
     fn add_guessed_word(&mut self, word: Word) {
         if self.turn {
-            self.first_player.guess_word(word);
+            self.game_config.first_player.guess_word(word);
         } else {
-            self.second_player.guess_word(word);
+            self.game_config.second_player.guess_word(word);
         }
     }
 
     fn check_word_in_wordlist(&mut self, guess: &Word) {
         if self.wordlist.contains(guess) {
-            if *guess == self.selected_word {
+            if *guess == self.game_config.selected_word {
                 self.end_game();
             } else {
-                print!("{}", match self.language {
+                print!("{}", match self.game_config.language {
                     Language::English => "Last guess: ",
                     Language::Portuguese => "Última jogada: ",
                 });
 
                 for word in &self.wordlist {
                     if word == guess {
-                        word.show_status(&self.selected_word);
+                        word.show_status(&self.game_config.selected_word);
                     }
                 }
 
@@ -177,7 +155,7 @@ impl Game {
             }
 
         } else {
-            println!("{} {}", guess, match self.language {
+            println!("{} {}", guess, match self.game_config.language {
                 Language::English => "is an invalid word or is not present in wordlist.",
                 Language::Portuguese => "é uma palavra inválida ou não está presente na lista de palavras.",
             });
@@ -193,39 +171,30 @@ impl Game {
     }
 
     fn end_game(&self) {
-        println!("\x1b[32m{}\x1b[0m", self.selected_word);
+        println!("\x1b[32m{}\x1b[0m", self.game_config.selected_word);
 
         if self.turn {
-            print!("\n{} {} ", self.first_player, match self.language {
+            print!("\n{} {} ", self.game_config.first_player, match self.game_config.language {
                 Language::English => "won the game after",
                 Language::Portuguese => "venceu o jogo após",
             });
         } else {
-            print!("\n{} {} ", self.second_player, match self.language {
+            print!("\n{} {} ", self.game_config.second_player, match self.game_config.language {
                 Language::English => "won the game after",
                 Language::Portuguese => "venceu o jogo após",
             });
         }
 
         if self.round == 1 {
-            println!("{}!", match self.language {
+            println!("{}!", match self.game_config.language {
                 Language::English => "only one try",
                 Language::Portuguese => "uma única tentativa",
             })
         } else {
-            println!("{} {}!", self.round, match self.language {
+            println!("{} {}!", self.round, match self.game_config.language {
                 Language::English => "tries",
                 Language::Portuguese => "tentativas",
             })
-        }
-    }
-}
-
-impl fmt::Display for Game {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.language {
-            Language::English => write!(f, "[First player: {}] [Second player: {}]", self.first_player, self.second_player),
-            Language::Portuguese => write!(f, "[Primeiro jogador: {}] [Segundo jogador: {}]", self.first_player, self.second_player),
         }
     }
 }
@@ -245,15 +214,6 @@ fn get_language_name(language: &Language) -> &str {
     }
 }
 
-fn get_random_word(wordlist: &HashSet<Word>) -> Word {
-    let word = &wordlist.iter().choose(&mut thread_rng());
-
-    match word {
-        Some(word) => Word::new(&word.get_word()),
-        None => panic!("Erro ao sortear palavra"),
-    }
-}
-
 fn get_wordlist(language_name: &str, difficulty_number: &str) -> HashSet<Word>{
     read_to_string(format!("resources/wordlist_{}_{}.txt", language_name, difficulty_number))
         .expect("Failed to read the file.")
@@ -262,7 +222,7 @@ fn get_wordlist(language_name: &str, difficulty_number: &str) -> HashSet<Word>{
         .collect()
 }
 
-fn read_player_two_guess(stream: &mut TcpStream) -> Result<String, std::io::Error> {
+fn read_player_one_guess(stream: &mut TcpStream) -> Result<String, std::io::Error> {
     let mut buffer = Vec::new();
     let mut temp_buffer = [0; 1024];
 
